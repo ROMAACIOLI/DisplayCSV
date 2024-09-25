@@ -24,25 +24,18 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: |
-          source venv/bin/activate
-          pip install -r requirements.txt
-
-      # Optional: Run tests (highly recommended)
-      - name: Run tests
-        run: |
-          source venv/bin/activate
-          pytest  # Ajuste de acordo com o seu framework de teste
-
+        run: pip install -r requirements.txt
+      
       - name: Zip artifact for deployment
-        run: zip -r release.zip ./* -x "venv/*"
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: release.zip
-
+          path: |
+            release.zip
+            !venv/
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -64,12 +57,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EAC36C7D7A524F76B6D410FBD742892B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03EC03711A1D4D5586D343641A53A966 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F708F395744E4237A66B8C330F59371C }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'displaycsv-fase6'
+          slot-name: 'Production'
